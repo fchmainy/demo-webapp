@@ -1,0 +1,21 @@
+{{- if .Values.ingress.enabled -}}
+{{- $fullName := include "webapp.fullname" . -}}
+{{- $svcPort := .Values.service.port -}}
+apiVersion: k8s.nginx.org/v1
+kind: VirtualServer
+metadata:
+  name: {{ $fullName }}
+spec:
+  host: {{ .Values.fqdn }}
+#  policies:
+#    - name: {{ .Values.fqdn }}-waf
+  upstreams:
+    - name: {{ $fullName }}
+      service: {{ include "webapp.fullname" . }}
+      port: 80
+  routes:
+    - path: {{ .Values.path }}
+      action:
+        pass: {{ $fullName }}
+
+{{- end }}
